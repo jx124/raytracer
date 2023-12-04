@@ -4,3 +4,7 @@ include/glad/*
 include/glfw/*
 include/KHR/*
 src/glad.c
+
+!include/glad/readme.md
+!include/glfw/readme.md
+!include/KHR/readme.md
