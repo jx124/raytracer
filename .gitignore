@@ -1,0 +1,6 @@
+.vscode/
+build/
+include/glad/*
+include/glfw/*
+include/KHR/*
+src/glad.c
