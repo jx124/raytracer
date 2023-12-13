@@ -1,11 +1,10 @@
 #pragma once
 
 #include "image.h"
-#include "ray.h"
-#include "glm/glm.hpp"
-
-#include <algorithm>
-#include <cmath>
+#include "utils.h"
+#include "hittable.h"
+#include "scene.h"
+#include "sphere.h"
 
 class Renderer {
 public:

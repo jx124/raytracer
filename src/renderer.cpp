@@ -4,25 +4,10 @@ Renderer::Renderer(int width, int height) : width(width), height(height), image(
     image.init();
 }
 
-float hitSphere(const Vec3& center, float radius, const Ray& ray) {
-    Vec3 oc = ray.orig - center;
-    float a = glm::dot(ray.dir, ray.dir);
-    float halfB = glm::dot(oc, ray.dir);
-    float c = glm::dot(oc, oc) - radius * radius;
-    float discriminant = halfB * halfB - a * c;
-    if (discriminant < 0) {
-        return -1.0f;
-    } else {
-        return (-halfB - std::sqrt(discriminant)) / a;
-    }
-}
-
-Vec3 rayColor(const Ray& ray) {
-    float t = hitSphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f, ray);
-    if (t > 0.0f) {
-        Vec3 normal = glm::normalize(ray.at(t) - Vec3(0.0f, 0.0f, -1.0f));
-
-        return 0.5f * Vec3(normal.x + 1, normal.y + 1, normal.z + 1);
+Vec3 rayColor(const Ray& ray, const Hittable& scene) {
+    HitRecord rec;
+    if (scene.hit(ray, 0, infinity, rec)) {
+        return 0.5f * (rec.normal + 1.0f);
     }
     Vec3 unitDirection = glm::normalize(ray.dir);
     float a = 0.5 * (unitDirection.y + 1.0f);
@@ -46,13 +31,17 @@ void Renderer::onRender() {
     Vec3 viewportUpperLeft = cameraCenter - Vec3(0.0f, 0.0f, focalLength) - viewportU / 2.0f - viewportV / 2.0f;
     Vec3 pixel00Loc = viewportUpperLeft + 0.5f * (pixelDeltaU + pixelDeltaV);
 
+    Scene scene;
+    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.5f));
+    scene.add(std::make_shared<Sphere>(Vec3(0.0f, -100.5f, -1.0f), 100.0f));
+
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
             Vec3 pixelCenter = pixel00Loc + static_cast<float>(i) * pixelDeltaU + static_cast<float>(j) * pixelDeltaV;
             Vec3 rayDirection = pixelCenter - cameraCenter;
             Ray ray(cameraCenter, rayDirection);
 
-            image.writePixel(i, j, rayColor(ray));
+            image.writePixel(i, j, rayColor(ray, scene));
         }
     }
 
