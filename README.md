@@ -13,3 +13,9 @@
 5. Install dependencies: `sudo apt install cmake xorg-dev` (For non X11 on Unix users, check out [this guide](https://www.glfw.org/docs/latest/compile_guide.html) for more details).
 6. Give permission to the build script: `chmod +x build.sh`
 7. Build and run the program `./build.sh -r`.
+
+
+## Acknowledgements
+This project uses material from the following sources:
+* [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
+* [_Physically Based Rendering: From Theory To Implementation_](https://pbr-book.org/4ed/contents).
