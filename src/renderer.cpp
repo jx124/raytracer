@@ -6,7 +6,7 @@ Renderer::Renderer(int width, int height) : width(width), height(height), image(
 
 Vec3 rayColor(const Ray& ray, const Hittable& scene) {
     HitRecord rec;
-    if (scene.hit(ray, 0, infinity, rec)) {
+    if (scene.hit(ray, Interval(0, infinity), rec)) {
         return 0.5f * (rec.normal + 1.0f);
     }
     Vec3 unitDirection = glm::normalize(ray.dir);

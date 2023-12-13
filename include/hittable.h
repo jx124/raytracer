@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ray.h"
-#include "glm/glm.hpp"
+#include "utils.h"
 
 struct HitRecord {
     Vec3 point;
@@ -21,5 +20,5 @@ struct HitRecord {
 class Hittable {
 public:
     virtual ~Hittable() = default;
-    virtual bool hit(const Ray& ray, float tMin, float tMax, HitRecord& rec) const = 0;
+    virtual bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const = 0;
 };

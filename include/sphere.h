@@ -6,7 +6,7 @@ class Sphere : public Hittable {
 public:
     Sphere(Vec3 center, float radius) : center(center), radius(radius) {}
 
-    bool hit(const Ray& ray, float tMin, float tMax, HitRecord& rec) const override {
+    bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const override {
         Vec3 oc = ray.orig - center;
         float a = glm::dot(ray.dir, ray.dir);
         float halfB = glm::dot(oc, ray.dir);
@@ -20,9 +20,9 @@ public:
         
         // Find nearest root in acceptable range
         float root = (-halfB - sqrtDisc) / a;
-        if (root <= tMin || root >= tMax) {
+        if (!rayT.surrounds(root)) {
             root = (-halfB + sqrtDisc) / a;
-            if (root <= tMin || root >= tMax) {
+            if (!rayT.surrounds(root)) {
                 return false;
             }
         }
