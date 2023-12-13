@@ -5,6 +5,7 @@
 #include "hittable.h"
 #include "scene.h"
 #include "sphere.h"
+#include "camera.h"
 
 class Renderer {
 public:
@@ -14,4 +15,6 @@ public:
 private:
     int width, height;
     Image image;
+    Camera camera;
+    Scene scene;
 };
