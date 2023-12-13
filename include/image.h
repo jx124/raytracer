@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glad/glad.h"
+#include "glm/vec3.hpp"
 
 #include <vector>
 #include <string>
@@ -18,6 +19,11 @@ public:
     void init();
     void display();
     inline std::vector<float>& getBuffer() { return buffer; };
+    inline void writePixel(int i, int j, const glm::vec3& value) { 
+        buffer[(i + j * width) * 3 + 0] = value.r;
+        buffer[(i + j * width) * 3 + 1] = value.g;
+        buffer[(i + j * width) * 3 + 2] = value.b;
+    };
     
 private:
     void compileShaders(std::string vertexPath, std::string fragmentPath);

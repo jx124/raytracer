@@ -1,6 +1,8 @@
 #pragma once
 
 #include "image.h"
+#include "ray.h"
+#include "glm/glm.hpp"
 
 #include <algorithm>
 #include <cmath>
