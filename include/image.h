@@ -12,7 +12,9 @@
 class Image {
 public:
     Image(int width, int height);
-    
+    // No destructor defined since ~UI() cleans up opengl objects.
+    // Might need to define one if multiple images are created and destroyed in the future.
+
     void init();
     void display();
     inline std::vector<float>& getBuffer() { return buffer; };

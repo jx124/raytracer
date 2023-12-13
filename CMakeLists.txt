@@ -8,7 +8,7 @@ add_compile_options(-Wall -Wextra)
 
 if(CMAKE_BUILD_TYPE STREQUAL "debug")
     add_compile_definitions(DEBUG=1)
-    add_compile_options(-fsanitize=address -fsanitize=leak -fsanitize=undefined -fstack-protector-strong -pipe)
+    add_compile_options(-fsanitize=address -fsanitize=leak -fsanitize=undefined -fstack-protector-strong -pipe -g)
     add_link_options(-fsanitize=address -fsanitize=undefined)
 else(CMAKE_BUILD_TYPE STREQUAL "release")
     add_compile_options(-O2 -march=native -flto -pipe)

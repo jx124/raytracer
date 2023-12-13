@@ -1,6 +1,6 @@
 #include "ui.h"
 
-UI::UI(int width, int height, std::string title) : image(Image(800, 600)) {
+UI::UI(int width, int height, std::string title) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, VERSION_MINOR);
@@ -25,20 +25,14 @@ UI::UI(int width, int height, std::string title) : image(Image(800, 600)) {
 
     std::printf("OpenGL Version: %s\nOpenGL Renderer: %s\n", glGetString(GL_VERSION), glGetString(GL_RENDERER));
 
-    image.init();
+    renderer.emplace(width, height);
 }
 
 void UI::run() {
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        // render loop
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        auto &buffer = image.getBuffer();
-        std::for_each(buffer.begin(), buffer.end(), [](float &f){ f += 0.01f; f = fmod(f, 1.0f); });
-        image.display();
+        renderer->onRender();
 
         glfwSwapBuffers(window);
         glfwPollEvents();            

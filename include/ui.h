@@ -3,12 +3,11 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "image.h"
+#include "renderer.h"
 
 #include <string>
 #include <iostream>
-#include <algorithm>
-#include <cmath>
+#include <optional>
 
 constexpr int VERSION_MAJOR = 4;
 constexpr int VERSION_MINOR = 6;
@@ -30,5 +29,5 @@ private:
     void processInput(GLFWwindow* window);
 
     GLFWwindow* window;
-    Image image;
+    std::optional<Renderer> renderer; // Needs an optional to defer construction to after GLFW is initialized.
 };
