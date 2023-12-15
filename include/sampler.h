@@ -31,8 +31,20 @@ public:
     virtual Vec2 get2DPixel() override { return get2D(); }
 };
 
+Vec2 sampleUniformDiskConcentric(Vec2 u);
+
 Vec3 sampleUniformSphere(Vec2 u);
+Vec3 sampleUniformHemisphere(Vec2 u);
+Vec3 sampleCosineHemisphere(Vec2 u);
 
 constexpr float uniformSpherePDF() {
     return 1.0f / (4 * pi);
+}
+
+constexpr float uniformHemipherePDF() {
+    return 1.0f / (2 * pi);
+}
+
+constexpr float cosineHemispherePDF(float cosTheta) {
+    return cosTheta / pi;
 }
