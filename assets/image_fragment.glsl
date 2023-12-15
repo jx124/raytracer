@@ -8,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    const float gamma = 1.0;
+    const float gamma = 2.2;
     vec4 color = texture(ImageTexture, TexCoord);
 
     const vec4 gammaCorrection = vec4(1.0 / gamma);

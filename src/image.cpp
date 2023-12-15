@@ -1,19 +1,7 @@
 #include "image.h"
 
 Image::Image(int width, int height) : width(width), height(height) {
-    buffer = std::vector<float>(width * height * 3);
-    
-    for (int j = 0; j < height; j++) {
-        for (int i = 0; i < width; i++) {
-            float r = float(i) / (width - 1);
-            float g = float(j) / (height - 1);
-            float b = 0;
-
-            buffer[(i + j * width) * 3 + 0] = r;
-            buffer[(i + j * width) * 3 + 1] = g;
-            buffer[(i + j * width) * 3 + 2] = b;
-        }
-    }
+    buffer = std::vector<float>(width * height * 3, 0.0f);
 }
 
 void Image::init() {

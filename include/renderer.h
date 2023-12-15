@@ -6,6 +6,7 @@
 #include "scene.h"
 #include "sphere.h"
 #include "camera.h"
+#include "sampler.h"
 
 class Renderer {
 public:
@@ -14,7 +15,10 @@ public:
 
 private:
     int width, height;
+    int maxDepth = 100;
+    bool complete = false;
     Image image;
     Camera camera;
     Scene scene;
+    IndependentSampler sampler;
 };
