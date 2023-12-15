@@ -1,12 +1,14 @@
 #pragma once
 
 #include "utils.h"
+#include "material.h"
 
 struct HitRecord {
     Vec3 point;
     Vec3 normal;
     float t;
     bool frontFace;
+    std::shared_ptr<Material> mat;
 
     void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {
         // Sets normal to point outwards.
