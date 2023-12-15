@@ -16,15 +16,19 @@ Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
 
     HitRecord rec;
     if (scene.hit(ray, Interval(0.0001f, infinity), rec)) {
-        // Vec3 wo = -ray.dir;
-        Vec3 wp = sampleUniformSphere(sampler->get2DPixel());
-
-        Vec3 fCos = Vec3(0.5f);// * std::abs(glm::dot(wp, rec.normal)); // BSDF(wo, wp) * wp dot N
+        // Rendering equation: Lo(p, wo) = Le(p, wo) + Int_Omega BSDF(p, wo, wi) * Li(p, wi) * |cos(theta_i)| dwi
+        // Monte Carlo estimator: 1/n Sum_i^n BSDF(p, wo, wi) * Li(p, wi) * |cos(theta_i)| / p(x_i)
         
-        // if !fCos return Le
-        Ray outRay(rec.point, wp + rec.normal);
+        // Vec3 wo = -ray.dir;
+        Vec3 wp = sampleCosineHemisphere(sampler->get2DPixel());
+        float cosTheta = glm::dot(wp, rec.normal);
 
-        return fCos * Li(outRay, scene, sampler, depth - 1);
+        Vec3 BSDFCos = Vec3(0.5f / pi) * cosTheta;
+        
+        // if BSDFCos == 0 return Le
+        Ray outRay(rec.point, wp);
+
+        return BSDFCos * Li(outRay, scene, sampler, depth - 1) / cosineHemispherePDF(cosTheta);
     }
 
     Vec3 unitDirection = glm::normalize(ray.dir);
