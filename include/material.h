@@ -44,10 +44,10 @@ private:
 
 class Metal : public Material {
 public:
-    Metal(Vec3 color) : color(color) {};
+    Metal(Vec3 color, float fuzz = 0) : color(color), fuzz(fuzz) {};
 
     virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler) const override {
-        Vec3 wi = reflect(wo, normal);
+        Vec3 wi = reflect(wo, normal) + fuzz * sampleUniformSphere(sampler->get2DPixel());
         float pdf = 1.0f;        
 
         Vec3 BSDFCos = color;
@@ -61,4 +61,5 @@ private:
     }
 
     Vec3 color;
+    float fuzz;
 };

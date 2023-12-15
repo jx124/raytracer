@@ -6,8 +6,8 @@ Renderer::Renderer(int width, int height)
     
     auto materialGround = std::make_shared<Lambertian>(Vec3(0.8f, 0.8f, 0.0f));
     auto materialCenter = std::make_shared<Lambertian>(Vec3(0.7f, 0.3f, 0.3f));
-    auto materialLeft   = std::make_shared<Metal>(Vec3(0.8f, 0.8f, 0.8f));
-    auto materialRight  = std::make_shared<Metal>(Vec3(0.8f, 0.6f, 0.2f));
+    auto materialLeft   = std::make_shared<Metal>(Vec3(0.8f, 0.8f, 0.8f), 0.1);
+    auto materialRight  = std::make_shared<Metal>(Vec3(0.8f, 0.6f, 0.2f), 0.5);
 
     scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.5f, materialCenter));
     scene.add(std::make_shared<Sphere>(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, materialLeft));
