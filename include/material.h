@@ -94,7 +94,7 @@ public:
             // transmit
             BSDFCos = Vec3(T / (etaRatio * etaRatio));
             wi = refract(in, normal, etaRatio, cosTheta_i, cosTheta_t);
-            pdf = 1.0f;
+            pdf = T;
         }
 
         return {BSDFCos, wi, pdf};
