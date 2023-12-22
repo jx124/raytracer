@@ -1,16 +1,16 @@
 #include "renderer.h"
 
 Renderer::Renderer(int width, int height) 
-    : width(width), height(height), image(width, height), camera(width, height), sampler(32) {
+        : width(width), height(height), image(width, height), camera(width, height), sampler(16) {
     image.init();
     
     auto materialGround = std::make_shared<Lambertian>(Vec3(0.8f, 0.8f, 0.0f));
     auto materialCenter = std::make_shared<Lambertian>(Vec3(0.7f, 0.3f, 0.3f));
-    auto materialLeft   = std::make_shared<Metal>(Vec3(0.8f, 0.8f, 0.8f), 0.1);
-    auto materialRight  = std::make_shared<Metal>(Vec3(0.8f, 0.6f, 0.2f), 0.5);
+    auto materialLeft   = std::make_shared<Dielectric>(1.5f);
+    auto materialRight  = std::make_shared<Metal>(Vec3(0.8f, 0.6f, 0.2f));
 
-    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.5f, materialCenter));
-    scene.add(std::make_shared<Sphere>(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, materialLeft));
+    scene.add(std::make_shared<Sphere>(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, materialCenter));
+    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.5f, materialLeft));
     scene.add(std::make_shared<Sphere>(Vec3(1.0f, 0.0f, -1.0f), 0.5f, materialRight));
     scene.add(std::make_shared<Sphere>(Vec3(0.0f, -100.5f, -1.0f), 100.0f, materialGround));
 }
@@ -22,7 +22,7 @@ Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
     }
 
     HitRecord rec;
-    if (scene.hit(ray, Interval(0.0001f, infinity), rec)) {
+    if (scene.hit(ray, Interval(0.00001f, infinity), rec)) {
         BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler);
         Ray outRay(rec.point, bs.wi);
 
