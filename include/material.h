@@ -16,15 +16,16 @@ struct BSDFSample {
 class Material {
 public:
     virtual ~Material() = default;
-    virtual BSDFSample sampleBSDF(const Vec3& in, const Vec3& normal, Sampler* sampler) const = 0;
+    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const = 0;
 };
 
 class Lambertian : public Material {
 public:
     Lambertian(Vec3 color) : color(color) {};
 
-    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler) const override {
+    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const override {
         (void) wo;
+        (void) frontFace;
         Vec3 wi = sampleUniformSphere(sampler->get2DPixel()) + normal;
 
         if (glm::dot(wi, wi) < 1e-8f) {
@@ -47,11 +48,11 @@ class Metal : public Material {
 public:
     Metal(Vec3 color, float fuzz = 0) : color(color), fuzz(fuzz) {};
 
-    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler) const override {
-        Vec3 wi = reflect(wo, normal) + fuzz * sampleUniformSphere(sampler->get2DPixel());
-        float pdf = 1.0f;        
-
+    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const override {
+        (void) frontFace;
         Vec3 BSDFCos = color;
+        Vec3 wi = reflect(wo, normal) + fuzz * sampleUniformSphere(sampler->get2DPixel());
+        float pdf = 1.0f;
 
         return {BSDFCos, wi, pdf};
     }
@@ -69,18 +70,16 @@ class Dielectric : public Material {
 public:
     Dielectric(float indexOfRefraction) : indexOfRefraction(indexOfRefraction) {}
 
-    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler) const override {
+    virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const override {
         Vec3 in = -glm::normalize(wo);
-        // float cosTheta_i = glm::dot(in, normal);
-        float cosTheta_t;
-        // float etaRatio = indexOfRefraction;
+        float etaRatio = indexOfRefraction;
 
-        // if (cosTheta_i < 0.0f) {
-        //     etaRatio = 1.0f / etaRatio;
-        //     cosTheta_i = -cosTheta_i;
-        // }
+        if (!frontFace) {
+            etaRatio = 1.0f / etaRatio;
+        }
 
-        float R = fresnelReflectance(in, normal, indexOfRefraction, &cosTheta_t);
+        float cosTheta_i, cosTheta_t;
+        float R = fresnelReflectance(in, normal, etaRatio, &cosTheta_i, &cosTheta_t);
         float T = 1.0f - R;
 
         Vec3 BSDFCos, wi;
@@ -93,8 +92,8 @@ public:
             pdf = R;
         } else {
             // transmit
-            BSDFCos = Vec3(T); // TODO: compensate for 1/eta^2 factor
-            wi = refract(in, normal, indexOfRefraction, cosTheta_t);
+            BSDFCos = Vec3(T / (etaRatio * etaRatio));
+            wi = refract(in, normal, etaRatio, cosTheta_i, cosTheta_t);
             pdf = 1.0f;
         }
 
@@ -102,37 +101,28 @@ public:
     }
 
     // Returns the probability of reflection.
-    static float fresnelReflectance(const Vec3& in, const Vec3& normal, float etaRatio, float* cosTheta_t) {
-        float cosTheta_i = glm::dot(in, normal);
+    static float fresnelReflectance(const Vec3& in, const Vec3& normal, 
+                                    float etaRatio, float* cosTheta_i, float* cosTheta_t) {
+        float tempCosTheta_i = std::abs(glm::dot(in, normal));
 
-        if (cosTheta_i < 0.0f) {
-            etaRatio = 1.0f / etaRatio;
-            cosTheta_i = -cosTheta_i;
-        }
-
-        float sin2Theta_i = std::max(0.0f, 1.0f - (cosTheta_i * cosTheta_i));
+        float sin2Theta_i = 1.0f - (tempCosTheta_i * tempCosTheta_i);
         float sin2Theta_t = sin2Theta_i / (etaRatio * etaRatio);
         if (sin2Theta_t >= 1.0f) {
+            *cosTheta_i = tempCosTheta_i;
+            *cosTheta_t = 0.0f;
             return 1.0f;
         }
         float tempCosTheta_t = std::sqrt(1.0f - sin2Theta_t);
 
-        float r_par = (etaRatio * cosTheta_i - tempCosTheta_t) / (etaRatio * cosTheta_i + tempCosTheta_t);
-        float r_perp = (etaRatio * tempCosTheta_t - cosTheta_i) / (etaRatio * tempCosTheta_t + cosTheta_i);
+        float r_par = (etaRatio * tempCosTheta_i - tempCosTheta_t) / (etaRatio * tempCosTheta_i + tempCosTheta_t);
+        float r_perp = (etaRatio * tempCosTheta_t - tempCosTheta_i) / (etaRatio * tempCosTheta_t + tempCosTheta_i);
+        *cosTheta_i = tempCosTheta_i;
         *cosTheta_t = tempCosTheta_t;
 
         return (r_par * r_par + r_perp * r_perp) / 2.0f;
     }
 
-    static Vec3 refract(const Vec3& in, Vec3 normal, float etaRatio, float cosTheta_t) {
-        float cosTheta_i = glm::dot(in, normal);
-
-        if (cosTheta_i < 0.0f) {
-            etaRatio = 1.0f / etaRatio;
-            cosTheta_i = -cosTheta_i;
-            normal = -normal;
-        }
-
+    static Vec3 refract(const Vec3& in, const Vec3& normal, float etaRatio, float cosTheta_i, float cosTheta_t) {
         return -in / etaRatio + (cosTheta_i / etaRatio - cosTheta_t) * normal;
     }
 

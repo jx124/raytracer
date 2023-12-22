@@ -31,8 +31,7 @@ public:
         rec.t = root;
         rec.point = ray.at(root);
         Vec3 normal = (rec.point - center) / radius;
-        // rec.setFaceNormal(ray, normal);
-        rec.normal = normal;
+        rec.setFaceNormal(ray, normal);
         rec.mat = material;
 
         return true;

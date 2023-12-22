@@ -10,12 +10,11 @@ struct HitRecord {
     bool frontFace;
     std::shared_ptr<Material> mat;
 
-    // TODO: refactor -- not used since dielectric refraction calculation requires outward normals
     void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {
-        // Sets normal to point outwards.
+        // Sets normal to be on the same face as hit ray.
         // Note: outwardNormal assumed to have unit length.
 
-        frontFace = glm::dot(ray.dir, outwardNormal) < 0.0f; // hit outer face
+        frontFace = glm::dot(ray.dir, outwardNormal) < 0.0f;
         normal = frontFace ? outwardNormal : -outwardNormal;
     }
 };

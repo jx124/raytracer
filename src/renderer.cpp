@@ -23,7 +23,7 @@ Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
 
     HitRecord rec;
     if (scene.hit(ray, Interval(0.00001f, infinity), rec)) {
-        BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler);
+        BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler, rec.frontFace);
         Ray outRay(rec.point, bs.wi);
 
         return bs.BSDFCos * Li(outRay, scene, sampler, depth - 1) / bs.pdf;
