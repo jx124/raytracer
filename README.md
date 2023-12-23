@@ -1,5 +1,11 @@
 # Monte Carlo Ray Tracer
 
+<p align="center">
+    <img src="assets/test_scene.png" alt="Test scene">
+    <br>
+    Test scene showing a diffuse, metallic, and hollow glass sphere.
+</p>
+    
 ## Quick Start
 1. Download the latest GLFW source packages from [here](https://www.glfw.org/download.html) and copy them into `include/glfw/`.
 2. Download the latest GLAD loaders from [here](https://glad.dav1d.de/) with the following settings:
