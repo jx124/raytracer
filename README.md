@@ -3,7 +3,7 @@
 <p align="center">
     <img src="assets/test_scene.png" alt="Test scene">
     <br>
-    Test scene with diffuse, metallic, and glass spheres, rendered with depth of field (100 samples per pixel, render time: 33.314s).
+    Test scene with diffuse, metallic, and glass spheres, rendered with depth of field (100 samples per pixel, render time: ~7s).
 </p>
     
 ## Quick Start
@@ -20,8 +20,26 @@
 6. Give permission to the build script: `chmod +x build.sh`
 7. Build and run the program `./build.sh -r`.
 
+## Features
+### Materials
+* Lambertian: perfectly diffuse material. Modifiable attributes:
+    * Color
+* Metal. Modifiable attributes:
+    * Color
+    * Fuzz
+* Dielectric: glass-like material that both refracts and reflects light. Modifiable attributes:
+    * Index of refraction
+
+### Geometries
+* Spheres
+* Coming soon: triangles/quadrilaterals
+
+### Optimizations
+* Parallelization using OpenMP (~7.4x speedup on 16 core machine).
+* Bounding Volume Hierarchies (BVHs) to speed up ray intersection tests (~4.7x speedup).
 
 ## Acknowledgements
 This project uses material from the following sources:
 * [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
+* [_Ray Tracing: The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 * [_Physically Based Rendering: From Theory To Implementation_](https://pbr-book.org/4ed/contents).
