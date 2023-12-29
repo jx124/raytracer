@@ -10,7 +10,11 @@ public:
     Scene() = default;
     Scene(std::shared_ptr<Hittable> object) { add(object); }
 
-    void add(std::shared_ptr<Hittable> object) { objects.push_back(object); }
+    void add(std::shared_ptr<Hittable> object) { 
+        objects.push_back(object); 
+        bbox = AABB(bbox, object->boundingBox());
+    }
+
     void clear() { objects.clear(); }
 
     bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const override {
@@ -29,6 +33,9 @@ public:
         return hitAnything;
     }
 
-private:
+    AABB boundingBox() const override { return bbox; }
+
     std::vector<std::shared_ptr<Hittable>> objects; // TODO: check if shared_ptr is required.
+private:
+    AABB bbox;
 };

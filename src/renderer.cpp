@@ -39,6 +39,8 @@ Renderer::Renderer(int width, int height)
 
     auto material3 = std::make_shared<Metal>(Vec3(0.7f, 0.6f, 0.5f));
     scene.add(std::make_shared<Sphere>(Vec3(4.0f, 1.0f, 0.0f), 1.0f, material3));
+
+    scene = Scene(std::make_shared<BVHNode>(scene));
 }
 
 // Incident radiance

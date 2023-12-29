@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "sampler.h"
+#include "bvh_node.h"
 
 #include "omp.h"
 

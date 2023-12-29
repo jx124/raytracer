@@ -2,6 +2,7 @@
 
 #include "utils.h"
 #include "material.h"
+#include "aabb.h"
 
 struct HitRecord {
     Vec3 point;
@@ -23,4 +24,5 @@ class Hittable {
 public:
     virtual ~Hittable() = default;
     virtual bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const = 0;
+    virtual AABB boundingBox() const = 0;
 };

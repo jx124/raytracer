@@ -5,7 +5,9 @@
 class Sphere : public Hittable {
 public:
     Sphere(Vec3 center, float radius, std::shared_ptr<Material> material) 
-        : center(center), radius(radius), material(material) {}
+        : center(center), radius(radius), material(material) {
+            bbox = AABB(center - Vec3(radius), center + Vec3(radius));
+        }
 
     bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const override {
         Vec3 oc = ray.orig - center;
@@ -37,8 +39,11 @@ public:
         return true;
     }
 
+    AABB boundingBox() const override { return bbox; }
+
 private:
     Vec3 center;
     float radius;
     std::shared_ptr<Material> material;
+    AABB bbox;
 };
