@@ -23,5 +23,7 @@ add_subdirectory("include/glfw")
 
 add_executable(raytracer ${source})
 
+find_package(OpenMP REQUIRED)
+
 target_include_directories(raytracer PUBLIC "include/")
-target_link_libraries(raytracer PUBLIC dl glfw)
+target_link_libraries(raytracer PUBLIC dl glfw OpenMP::OpenMP_CXX)

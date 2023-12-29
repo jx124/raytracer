@@ -51,11 +51,11 @@ public:
     }
 
     // TODO: design a better camera interface
-    Vec3 lookFrom = Vec3(-2.0f, 2.0f, 1.0f);
-    Vec3 lookAt = Vec3(0.0f, 0.0f, -1.0f);
+    Vec3 lookFrom = Vec3(13.0f, 2.0f, 3.0f);
+    Vec3 lookAt = Vec3(0.0f, 0.0f, 0.0f);
     Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
-    float defocusAngle = 10.0f;
-    float focalLength = 3.4f;
+    float defocusAngle = 0.6f;
+    float focalLength = 10.0f;
 
 private:
     int imageWidth;

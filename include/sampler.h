@@ -13,6 +13,7 @@ public:
     int getSamplesPerPixel() { return samplesPerPixel; }
     virtual float get1D() = 0;
     virtual Vec2 get2D() = 0;
+    virtual Vec3 get3D() = 0;
     virtual Vec2 get2DPixel() = 0;
 
 protected:
@@ -28,6 +29,7 @@ public:
 
     virtual float get1D() override { return rng.uniform<float>(); }
     virtual Vec2 get2D() override { return {rng.uniform<float>(), rng.uniform<float>()}; }
+    virtual Vec3 get3D() override { return {rng.uniform<float>(), rng.uniform<float>(), rng.uniform<float>()}; }
     virtual Vec2 get2DPixel() override { return get2D(); }
 };
 

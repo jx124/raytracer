@@ -1,19 +1,44 @@
 #include "renderer.h"
 
 Renderer::Renderer(int width, int height) 
-        : width(width), height(height), image(width, height), camera(width, height), sampler(16) {
+        : width(width), height(height), image(width, height), camera(width, height), sampler(100, 1234) {
     image.init();
-    
-    auto materialGround = std::make_shared<Lambertian>(Vec3(0.8f, 0.8f, 0.0f));
-    auto materialCenter = std::make_shared<Lambertian>(Vec3(0.1f, 0.2f, 0.5f));
-    auto materialLeft   = std::make_shared<Dielectric>(1.5f);
-    auto materialRight  = std::make_shared<Metal>(Vec3(0.8f, 0.6f, 0.2f));
 
-    scene.add(std::make_shared<Sphere>(Vec3(-1.0f, 0.0f, -1.0f), 0.49f, materialCenter));
-    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), 0.49f, materialLeft));
-    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 0.0f, -1.0f), -0.4f, materialLeft));
-    scene.add(std::make_shared<Sphere>(Vec3(1.0f, 0.0f, -1.0f), 0.49f, materialRight));
-    scene.add(std::make_shared<Sphere>(Vec3(0.0f, -100.5f, -1.0f), 100.0f, materialGround));
+    auto groundMaterial = std::make_shared<Lambertian>(Vec3(0.5f, 0.5f, 0.5f));
+    scene.add(std::make_shared<Sphere>(Vec3(0.0f, -1000.0f, 0.0f), 1000.0f, groundMaterial));
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            float chooseMaterial = sampler.get1D();
+            Vec3 center(a + 0.9f * sampler.get1D(), 0.2f, b + 0.9f * sampler.get1D());
+
+            if (glm::length(center - Vec3(4.0f, 0.2f, 0.0f)) > 0.9f) {
+                std::shared_ptr<Material> sphereMaterial;
+
+                if (chooseMaterial < 0.8) {
+                    // diffuse
+                    sphereMaterial = std::make_shared<Lambertian>(sampler.get3D() * sampler.get3D());
+                } else if (chooseMaterial < 0.95) {
+                    // metal
+                    sphereMaterial = std::make_shared<Metal>(sampler.get3D() / 2.0f + Vec3(0.5f),
+                                                             sampler.get1D() / 2.0f);
+                } else {
+                    // glass
+                    sphereMaterial = std::make_shared<Dielectric>(1.5f);
+                }
+                scene.add(std::make_shared<Sphere>(center, 0.2f, sphereMaterial));
+            }
+        }
+    }
+
+    auto material1 = std::make_shared<Dielectric>(1.5f);
+    scene.add(std::make_shared<Sphere>(Vec3(0.0f, 1.0f, 0.0f), 1.0f, material1));
+
+    auto material2 = std::make_shared<Lambertian>(Vec3(0.4f, 0.2f, 0.1f));
+    scene.add(std::make_shared<Sphere>(Vec3(-4.0f, 1.0f, 0.0f), 1.0f, material2));
+
+    auto material3 = std::make_shared<Metal>(Vec3(0.7f, 0.6f, 0.5f));
+    scene.add(std::make_shared<Sphere>(Vec3(4.0f, 1.0f, 0.0f), 1.0f, material3));
 }
 
 // Incident radiance
@@ -23,7 +48,7 @@ Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
     }
 
     HitRecord rec;
-    if (scene.hit(ray, Interval(0.0001f, infinity), rec)) {
+    if (scene.hit(ray, Interval(0.001f, infinity), rec)) {
         BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler, rec.frontFace);
         Ray outRay(rec.point, bs.wi);
 
@@ -40,13 +65,13 @@ void Renderer::onRender() {
         return;
     }
 
-    Vec3 pixelRadiance(0.0f);
-    for (int j = 0; j < height; j++) {
-        if (j % 50 == 0) {
-            std::printf("\rProgress: %d/%d (%.2f%%) complete", j, height, static_cast<float>(j * 100) / height);
-            std::cout << std::flush;
-        }
+    auto startTime = std::chrono::high_resolution_clock::now();
 
+    Vec3 pixelRadiance(0.0f);
+    int linesComplete = 0;
+
+    #pragma omp parallel for schedule(dynamic) shared(image, linesComplete) firstprivate(sampler, camera, pixelRadiance)
+    for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
             pixelRadiance = {0.0f, 0.0f, 0.0f};
             for (int s = 0; s < sampler.getSamplesPerPixel(); s++) {
@@ -55,9 +80,23 @@ void Renderer::onRender() {
             }
             image.writePixel(i, j, pixelRadiance / static_cast<float>(sampler.getSamplesPerPixel()));
         }
+
+        #pragma omp atomic
+        linesComplete++;
+    
+        #pragma omp critical
+        if (linesComplete % 50 == 0) {
+            std::printf("\rProgress: %d/%d (%.2f%%) complete", linesComplete, height, 
+                static_cast<float>(linesComplete * 100) / height);
+            std::cout << std::flush;
+        }
     }
 
+    auto endTime = std::chrono::high_resolution_clock::now();
+
     complete = true;
-    std::cout << "\nRender complete" << std::endl;
+    std::cout << "\nRender complete, time taken: " 
+        << static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()) / 1000
+        << " s" << std::endl;
     image.display();
 }

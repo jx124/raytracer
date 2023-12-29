@@ -8,6 +8,8 @@
 #include "camera.h"
 #include "sampler.h"
 
+#include <chrono>
+
 class Renderer {
 public:
     Renderer(int width, int height);
@@ -15,7 +17,7 @@ public:
 
 private:
     int width, height;
-    int maxDepth = 100;
+    int maxDepth = 50;
     bool complete = false;
     Image image;
     Camera camera;
