@@ -70,7 +70,7 @@ void Renderer::onRender() {
     Vec3 pixelRadiance(0.0f);
     int linesComplete = 0;
 
-    #pragma omp parallel for schedule(dynamic) shared(image, linesComplete) firstprivate(sampler, camera, pixelRadiance)
+    #pragma omp parallel for schedule(dynamic) default(shared) firstprivate(sampler, camera, pixelRadiance) 
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
             pixelRadiance = {0.0f, 0.0f, 0.0f};
