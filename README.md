@@ -3,7 +3,7 @@
 <p align="center">
     <img src="assets/test_scene.png" alt="Test scene">
     <br>
-    Test scene showing a diffuse, metallic, and hollow glass sphere.
+    Test scene with diffuse, metallic, and glass spheres, rendered with depth of field (100 samples per pixel, render time: 33.314s).
 </p>
     
 ## Quick Start
