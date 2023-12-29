@@ -29,13 +29,30 @@ UI::UI(int width, int height, std::string title) {
 }
 
 void UI::run() {
+
+    auto future = std::async(std::launch::async, [this](){
+        renderer->onRender();
+    });
+
+    std::future_status status;
+    auto timeout = std::chrono::milliseconds(0);
+
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        renderer->onRender();
+        if (future.valid()) {
+            status = future.wait_for(timeout);
+        }
 
+        if (future.valid() && status == std::future_status::ready) {
+            future = std::async(std::launch::async, [this](){
+                renderer->onRender();
+            });
+        }
+
+        renderer->displayImage();
         glfwSwapBuffers(window);
-        glfwPollEvents();            
+        glfwPollEvents();
     }
 }
 

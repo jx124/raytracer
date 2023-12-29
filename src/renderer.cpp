@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 Renderer::Renderer(int width, int height) 
-        : width(width), height(height), image(width, height), camera(width, height), sampler(100, 1234) {
+        : width(width), height(height), image(width, height), camera(width, height), sampler(16, 1234) {
     image.init();
 
     auto groundMaterial = std::make_shared<Lambertian>(Vec3(0.5f, 0.5f, 0.5f));
@@ -98,5 +98,4 @@ void Renderer::onRender() {
     std::cout << "\nRender complete, time taken: " 
         << static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()) / 1000
         << " s" << std::endl;
-    image.display();
 }

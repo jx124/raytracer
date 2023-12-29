@@ -8,12 +8,15 @@
 #include "camera.h"
 #include "sampler.h"
 
+#include "omp.h"
+
 #include <chrono>
 
 class Renderer {
 public:
     Renderer(int width, int height);
     void onRender();
+    void displayImage() { image.display(); };
 
 private:
     int width, height;

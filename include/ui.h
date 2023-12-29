@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <optional>
+#include <future>
 
 constexpr int VERSION_MAJOR = 4;
 constexpr int VERSION_MINOR = 6;
