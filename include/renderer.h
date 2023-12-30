@@ -5,6 +5,7 @@
 #include "hittable.h"
 #include "scene.h"
 #include "sphere.h"
+#include "quad.h"
 #include "camera.h"
 #include "sampler.h"
 #include "bvh_node.h"
@@ -18,6 +19,7 @@ public:
     Renderer(int width, int height);
     void onRender();
     void displayImage() { image.display(); };
+    Scene generateScene(int index);
 
 private:
     int width, height;
