@@ -5,9 +5,9 @@
 
 class Camera {
 public:
-    Camera(int imageWidth, int imageHeight, float verticalFOV = 20.0f)
-            : imageWidth(imageWidth), imageHeight(imageHeight), verticalFOV(verticalFOV) {
+    Camera(int imageWidth, int imageHeight) : imageWidth(imageWidth), imageHeight(imageHeight) {}
 
+    void init() {
         aspectRatio = static_cast<float>(imageWidth) / imageHeight;
         cameraCenter = lookFrom;
 
@@ -56,15 +56,15 @@ public:
     Vec3 cameraUp = Vec3(0.0f, 1.0f, 0.0f);
     float defocusAngle = 0.6f;
     float focalLength = 10.0f;
-
-private:
+    float verticalFOV = 20.0f;      // vertical field of view in degrees
     int imageWidth;
     int imageHeight;
+
+private:
 
     float aspectRatio;
     float viewportHeight;
     float viewportWidth;
-    float verticalFOV;      // vertical field of view in degrees
     
     Vec3 cameraCenter;
     Vec3 viewportU;
