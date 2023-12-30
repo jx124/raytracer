@@ -56,5 +56,14 @@ public:
         return true;
     }
 
+    AABB pad() {
+        constexpr float delta = 0.0001f;
+        Interval newX = (x.size() >= delta) ? x : x.expand(delta);
+        Interval newY = (y.size() >= delta) ? y : y.expand(delta);
+        Interval newZ = (z.size() >= delta) ? z : z.expand(delta);
+
+        return AABB(newX, newY, newZ);
+    }
+
     Interval x, y, z;
 };
