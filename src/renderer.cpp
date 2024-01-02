@@ -4,7 +4,20 @@ Renderer::Renderer(int width, int height)
         : width(width), height(height), image(width, height), camera(width, height), sampler(32, 1234) {
 
     image.init();
-    scene = Scene(std::make_shared<BVHNode>(generateScene(2)));
+    scene = Scene(std::make_shared<BVHNode>(generateScene(3)));
+}
+
+Vec3 backgroundColor(const Vec3& direction, int type) {
+    switch (type) {
+    case 1:
+        // black
+        return Vec3(0.0f);
+    case 2: default:
+        // sky blue
+        Vec3 unitDirection = glm::normalize(direction);
+        float a = 0.5 * (unitDirection.y + 1.0f);
+        return (1.0f - a) * Vec3(1.0f) + a * Vec3(0.5f, 0.7f, 1.0f);
+    }
 }
 
 // Incident radiance
@@ -18,12 +31,10 @@ Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
         BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler, rec.frontFace);
         Ray outRay(rec.point, bs.wi);
 
-        return bs.BSDFCos * Li(outRay, scene, sampler, depth - 1) / bs.pdf;
+        return bs.BSDFCos * Li(outRay, scene, sampler, depth - 1) / bs.pdf + rec.mat->Le(ray.dir, rec.normal);
     }
 
-    Vec3 unitDirection = glm::normalize(ray.dir);
-    float a = 0.5 * (unitDirection.y + 1.0f);
-    return (1.0f - a) * Vec3(1.0f) + a * Vec3(0.5f, 0.7f, 1.0f);
+    return backgroundColor(ray.dir, 1);
 }
 
 void Renderer::onRender() {
@@ -147,14 +158,42 @@ Scene quads(Camera& camera) {
     camera.init();
 
     return scene;
-} 
+}
+
+Scene cornellBox(Camera& camera) {
+    Scene scene;
+
+    auto red   = std::make_shared<Lambertian>(Vec3(0.65f, 0.05f, 0.05f));
+    auto white = std::make_shared<Lambertian>(Vec3(0.73f, 0.73f, 0.73f));
+    auto green = std::make_shared<Lambertian>(Vec3(0.12f, 0.45f, 0.15f));
+    auto light = std::make_shared<Lambertian>(Vec3(1.0f), Vec3(15.0f));
+
+    scene.add(std::make_shared<Quad>(Vec3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
+    scene.add(std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+    scene.add(std::make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
+    scene.add(std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    scene.add(std::make_shared<Quad>(Vec3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
+    scene.add(std::make_shared<Quad>(Vec3(0, 555, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    scene.add(std::make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+
+    camera.verticalFOV = 40.0f;
+    camera.lookFrom = Vec3(278, 278, -800);
+    camera.lookAt = Vec3(278, 278, 0);
+    camera.cameraUp = Vec3(0,1,0);
+    camera.defocusAngle = 0.0f;
+
+    camera.init();
+
+    return scene;
+}
 
 Scene Renderer::generateScene(int index) {
     switch (index) {
     case 1:
         return randomSpheres(&sampler, camera);
     case 2:
-    default:
         return quads(camera);
+    case 3: default:
+        return cornellBox(camera);
     }
 }
