@@ -16,6 +16,7 @@ public:
     virtual Vec2 get2D() = 0;
     virtual Vec3 get3D() = 0;
     virtual Vec2 get2DPixel() = 0;
+    virtual std::unique_ptr<Sampler> clone() const = 0;
 
 protected:
     int samplesPerPixel;
@@ -23,7 +24,6 @@ protected:
     RNG rng;
 };
 
-// TODO: implement compile time polymorphism?
 class IndependentSampler : public Sampler {
 public:
     IndependentSampler(int samplesPerPixel, int seed = 0) : Sampler(samplesPerPixel, seed) {}
@@ -32,10 +32,12 @@ public:
     virtual Vec2 get2D() override { return {rng.uniform<float>(), rng.uniform<float>()}; }
     virtual Vec3 get3D() override { return {rng.uniform<float>(), rng.uniform<float>(), rng.uniform<float>()}; }
     virtual Vec2 get2DPixel() override { return get2D(); }
+    virtual std::unique_ptr<Sampler> clone() const override {
+        return std::make_unique<IndependentSampler>(samplesPerPixel, seed);
+    };
 };
 
 Vec2 sampleUniformDiskConcentric(Vec2 u);
-
 Vec3 sampleUniformSphere(Vec2 u);
 Vec3 sampleUniformHemisphere(Vec2 u);
 Vec3 sampleCosineHemisphere(Vec2 u);

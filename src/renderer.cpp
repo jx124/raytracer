@@ -1,10 +1,11 @@
 #include "renderer.h"
 
 Renderer::Renderer(int width, int height) 
-        : width(width), height(height), image(width, height), camera(width, height), sampler(32, 1234) {
+        : width(width), height(height), image(width, height), camera(width, height) {
 
     image.init();
     scene = Scene(std::make_shared<BVHNode>(generateScene(3)));
+    sampler = std::make_unique<IndependentSampler>(32);
 }
 
 Vec3 backgroundColor(const Vec3& direction, int type) {
@@ -43,23 +44,29 @@ void Renderer::onRender() {
     }
 
     auto startTime = std::chrono::high_resolution_clock::now();
-
-    Vec3 pixelRadiance(0.0f);
     int linesComplete = 0;
 
-    #pragma omp parallel default(none) firstprivate(sampler, camera, pixelRadiance) shared(linesComplete, std::cout)
+    #pragma omp parallel default(none) firstprivate(camera) shared(sampler, linesComplete, std::cout)
     {
-        sampler.setSeed(omp_get_thread_num());
+        std::unique_ptr<Sampler> samplerCloneUnique;
+
+        #pragma omp critical
+        samplerCloneUnique = sampler->clone();
+
+        Sampler* samplerClone = samplerCloneUnique.get();
+        samplerClone->setSeed(omp_get_thread_num());
+
+        Vec3 pixelRadiance(0.0f);
 
         #pragma omp for schedule(dynamic) 
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width; i++) {
                 pixelRadiance = {0.0f, 0.0f, 0.0f};
-                for (int s = 0; s < sampler.getSamplesPerPixel(); s++) {
-                    Ray cameraRay = camera.generateRay(i, j, &sampler);
-                    pixelRadiance += Li(cameraRay, scene, &sampler, maxDepth);
+                for (int s = 0; s < samplerClone->getSamplesPerPixel(); s++) {
+                    Ray cameraRay = camera.generateRay(i, j, samplerClone);
+                    pixelRadiance += Li(cameraRay, scene, samplerClone, maxDepth);
                 }
-                image.writePixel(i, j, pixelRadiance / static_cast<float>(sampler.getSamplesPerPixel()));
+                image.writePixel(i, j, pixelRadiance / static_cast<float>(sampler->getSamplesPerPixel()));
             }
 
             #pragma omp atomic
@@ -190,7 +197,7 @@ Scene cornellBox(Camera& camera) {
 Scene Renderer::generateScene(int index) {
     switch (index) {
     case 1:
-        return randomSpheres(&sampler, camera);
+        return randomSpheres(sampler.get(), camera);
     case 2:
         return quads(camera);
     case 3: default:

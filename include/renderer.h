@@ -28,5 +28,5 @@ private:
     Image image;
     Camera camera;
     Scene scene;
-    IndependentSampler sampler;
+    std::unique_ptr<Sampler> sampler;
 };
