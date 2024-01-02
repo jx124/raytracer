@@ -13,6 +13,19 @@ public:
 		(void)pcg32();
 	}
 
+	RNG(const RNG& other) : state(other.state) {};
+	RNG(RNG&& other) : state(other.state) {};
+
+	RNG& operator=(const RNG& other) {
+		state = other.state;
+		return *this;
+	};
+
+	RNG& operator=(RNG&& other) {
+		state = other.state;
+		return *this;
+	};
+
 	template <typename T>
 	T uniform();
 

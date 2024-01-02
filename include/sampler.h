@@ -11,6 +11,7 @@ public:
     Sampler(int samplesPerPixel, int seed = 0) : samplesPerPixel(samplesPerPixel), seed(seed), rng(seed) {}
 
     int getSamplesPerPixel() { return samplesPerPixel; }
+    void setSeed(int newSeed) { rng = RNG(newSeed); }
     virtual float get1D() = 0;
     virtual Vec2 get2D() = 0;
     virtual Vec3 get3D() = 0;
