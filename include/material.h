@@ -17,11 +17,16 @@ class Material {
 public:
     virtual ~Material() = default;
     virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const = 0;
+    virtual Vec3 Le(const Vec3& wo, const Vec3& normal) const {
+        (void) wo;
+        (void) normal;
+        return Vec3(0.0f);
+    }
 };
 
 class Lambertian : public Material {
 public:
-    Lambertian(Vec3 color) : color(color) {};
+    Lambertian(Vec3 color, Vec3 emissionColor = Vec3(0.0f)) : color(color), emissionColor(emissionColor) {};
 
     virtual BSDFSample sampleBSDF(const Vec3& wo, const Vec3& normal, Sampler* sampler, bool frontFace) const override {
         (void) wo;
@@ -40,8 +45,15 @@ public:
         return {BSDFCos, wi, pdf};
     }
 
+    virtual Vec3 Le(const Vec3& wo, const Vec3& normal) const override {
+        (void) wo;
+        (void) normal; // For future use in directional lighting?
+        return emissionColor;
+    }
+
 private:
     Vec3 color;
+    Vec3 emissionColor;
 };
 
 class Metal : public Material {
