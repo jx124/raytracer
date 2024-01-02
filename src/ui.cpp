@@ -24,12 +24,12 @@ UI::UI(int width, int height, std::string title) {
     #endif
 
     std::printf("OpenGL Version: %s\nOpenGL Renderer: %s\n", glGetString(GL_VERSION), glGetString(GL_RENDERER));
+    std::cout << std::flush;
 
     renderer.emplace(width, height);
 }
 
 void UI::run() {
-
     auto future = std::async(std::launch::async, [this](){
         renderer->onRender();
     });
@@ -56,8 +56,7 @@ void UI::run() {
     }
 }
 
-void UI::framebufferSizeCallback(GLFWwindow *window, int width, int height)
-{
+void UI::framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     (void) window;
     glViewport(0, 0, width, height);
 }
@@ -143,6 +142,7 @@ void UI::debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
     }
     
     std::printf("%s: %s [Severity: %s] (ID: %d): %s\n", sourceStr, typeStr, severityStr, id, message);
+    std::cout << std::flush;
 }
 
 void UI::processInput(GLFWwindow *window) {
