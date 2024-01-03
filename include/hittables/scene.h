@@ -13,6 +13,7 @@ public:
     void add(std::shared_ptr<Hittable> object);
     void clear();
     bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const override;
+    Vec3 backgroundColor(const Vec3& direction, int type) const;
     AABB boundingBox() const override;
 
     std::vector<std::shared_ptr<Hittable>> objects; // TODO: check if shared_ptr is required.

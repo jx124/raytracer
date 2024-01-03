@@ -6,36 +6,7 @@ Renderer::Renderer(int width, int height)
     image.init();
     scene = Scene(std::make_shared<BVHNode>(generateScene(3)));
     sampler = std::make_unique<IndependentSampler>(32);
-}
-
-Vec3 backgroundColor(const Vec3& direction, int type) {
-    switch (type) {
-    case 1:
-        // black
-        return Vec3(0.0f);
-    case 2: default:
-        // sky blue
-        Vec3 unitDirection = glm::normalize(direction);
-        float a = 0.5 * (unitDirection.y + 1.0f);
-        return (1.0f - a) * Vec3(1.0f) + a * Vec3(0.5f, 0.7f, 1.0f);
-    }
-}
-
-// Incident radiance
-Vec3 Li(const Ray& ray, const Hittable& scene, Sampler* sampler, int depth) {
-    if (depth == 0) {
-        return Vec3(0.0f);
-    }
-
-    HitRecord rec;
-    if (scene.hit(ray, Interval(0.001f, infinity), rec)) {
-        BSDFSample bs = rec.mat->sampleBSDF(ray.dir, rec.normal, sampler, rec.frontFace);
-        Ray outRay(rec.point, bs.wi);
-
-        return bs.BSDFCos * Li(outRay, scene, sampler, depth - 1) / bs.pdf + rec.mat->Le(ray.dir, rec.normal);
-    }
-
-    return backgroundColor(ray.dir, 1);
+    integrator = std::make_unique<RandomWalkIntegrator>(scene);
 }
 
 void Renderer::onRender() {
@@ -64,7 +35,7 @@ void Renderer::onRender() {
                 pixelRadiance = {0.0f, 0.0f, 0.0f};
                 for (int s = 0; s < samplerClone->getSamplesPerPixel(); s++) {
                     Ray cameraRay = camera.generateRay(i, j, samplerClone);
-                    pixelRadiance += Li(cameraRay, scene, samplerClone, maxDepth);
+                    pixelRadiance += integrator->Li(cameraRay, samplerClone, maxDepth);
                 }
                 image.writePixel(i, j, pixelRadiance / static_cast<float>(sampler->getSamplesPerPixel()));
             }

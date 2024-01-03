@@ -29,6 +29,19 @@ bool Scene::hit(const Ray &ray, Interval rayT, HitRecord &rec) const {
     return hitAnything;
 }
 
+Vec3 Scene::backgroundColor(const Vec3 &direction, int type) const {
+    switch (type) {
+    case 1:
+        // black
+        return Vec3(0.0f);
+    case 2: default:
+        // sky blue
+        Vec3 unitDirection = glm::normalize(direction);
+        float a = 0.5 * (unitDirection.y + 1.0f);
+        return (1.0f - a) * Vec3(1.0f) + a * Vec3(0.5f, 0.7f, 1.0f);
+    }
+}
+
 AABB Scene::boundingBox() const {
     return bbox;
 }

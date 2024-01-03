@@ -5,10 +5,11 @@
 #include "hittables/sphere.h"
 #include "hittables/quad.h"
 #include "hittables/bvh_node.h"
+#include "math/sampler.h"
 #include "image.h"
 #include "utils.h"
 #include "camera.h"
-#include "math/sampler.h"
+#include "integrator.h"
 
 #include "omp.h"
 
@@ -29,4 +30,5 @@ private:
     Camera camera;
     Scene scene;
     std::unique_ptr<Sampler> sampler;
+    std::unique_ptr<Integrator> integrator;
 };
