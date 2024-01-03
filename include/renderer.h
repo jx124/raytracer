@@ -20,7 +20,6 @@ public:
     Renderer(int width, int height);
     void onRender();
     void displayImage();
-    Scene generateScene(int index);
 
 private:
     int width, height;
