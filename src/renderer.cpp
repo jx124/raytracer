@@ -89,6 +89,10 @@ void Renderer::onRender() {
         << " s" << std::endl;
 }
 
+void Renderer::displayImage() {
+    image.display();
+};
+
 Scene randomSpheres(Sampler* sampler, Camera& camera) {
     Scene scene;
     auto groundMaterial = std::make_shared<Lambertian>(Vec3(0.5f, 0.5f, 0.5f));

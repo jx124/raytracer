@@ -8,10 +8,12 @@ using Vec2 = glm::vec2;
 
 class Sampler {
 public:
-    Sampler(int samplesPerPixel, int seed = 0) : samplesPerPixel(samplesPerPixel), seed(seed), rng(seed) {}
+    Sampler(int samplesPerPixel, int seed = 0);
+    virtual ~Sampler() = default;
 
-    int getSamplesPerPixel() { return samplesPerPixel; }
-    void setSeed(int newSeed) { rng = RNG(newSeed); }
+    int getSamplesPerPixel() const;
+    void setSeed(int newSeed);
+
     virtual float get1D() = 0;
     virtual Vec2 get2D() = 0;
     virtual Vec3 get3D() = 0;
@@ -26,15 +28,13 @@ protected:
 
 class IndependentSampler : public Sampler {
 public:
-    IndependentSampler(int samplesPerPixel, int seed = 0) : Sampler(samplesPerPixel, seed) {}
+    IndependentSampler(int samplesPerPixel, int seed = 0);
 
-    virtual float get1D() override { return rng.uniform<float>(); }
-    virtual Vec2 get2D() override { return {rng.uniform<float>(), rng.uniform<float>()}; }
-    virtual Vec3 get3D() override { return {rng.uniform<float>(), rng.uniform<float>(), rng.uniform<float>()}; }
-    virtual Vec2 get2DPixel() override { return get2D(); }
-    virtual std::unique_ptr<Sampler> clone() const override {
-        return std::make_unique<IndependentSampler>(samplesPerPixel, seed);
-    };
+    virtual float get1D() override;
+    virtual Vec2 get2D() override;
+    virtual Vec3 get3D() override;
+    virtual Vec2 get2DPixel() override;
+    virtual std::unique_ptr<Sampler> clone() const override;
 };
 
 Vec2 sampleUniformDiskConcentric(Vec2 u);

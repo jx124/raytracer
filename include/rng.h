@@ -3,28 +3,18 @@
 #include <cstdint>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 constexpr float oneMinusEpsilon = 0x1.fffffep-1;
 
 class RNG {
 public:
-	RNG(uint64_t seed) {
-		state = seed + increment;
-		(void)pcg32();
-	}
+	RNG(uint64_t seed);
+	RNG(const RNG& other);
+	RNG(RNG&& other);
 
-	RNG(const RNG& other) : state(other.state) {};
-	RNG(RNG&& other) : state(other.state) {};
-
-	RNG& operator=(const RNG& other) {
-		state = other.state;
-		return *this;
-	};
-
-	RNG& operator=(RNG&& other) {
-		state = other.state;
-		return *this;
-	};
+	RNG& operator=(const RNG& other);
+	RNG& operator=(RNG&& other);
 
 	template <typename T>
 	T uniform();
@@ -40,18 +30,8 @@ public:
 	}
 
 private:
-	uint32_t rotr32(uint32_t x, unsigned r) {
-		return x >> r | x << (-r & 31);
-	}
-
-	uint32_t pcg32() {
-		uint64_t x = state;
-		unsigned count = (unsigned)(x >> 59);
-
-		state = x * multiplier + increment;
-		x ^= x >> 18;
-		return rotr32((uint32_t)(x >> 27), count);
-	}
+	uint32_t rotr32(uint32_t x, unsigned r);
+	uint32_t pcg32();
 
     uint64_t state = 0x4d595df4d0f33173;
 	uint64_t const multiplier = 6364136223846793005u;
@@ -59,20 +39,10 @@ private:
 };
 
 template<>
-inline uint32_t RNG::uniform<uint32_t>() {
-	return pcg32();
-}
+uint32_t RNG::uniform<uint32_t>();
 
 template<>
-inline int32_t RNG::uniform<int32_t>() {
-	uint32_t v = uniform<uint32_t>();
-    if (v <= (uint32_t)std::numeric_limits<int32_t>::max()) {
-        return int32_t(v);
-	}
-    return int32_t(v - std::numeric_limits<int32_t>::min()) + std::numeric_limits<int32_t>::min();
-}
+int32_t RNG::uniform<int32_t>();
 
 template<>
-inline float RNG::uniform<float>() {
-	return std::min<float>(oneMinusEpsilon, uniform<uint32_t>() * 0x1p-32f);
-}
+float RNG::uniform<float>();

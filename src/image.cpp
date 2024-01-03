@@ -60,6 +60,12 @@ void Image::display() {
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
+void Image::writePixel(int i, int j, const glm::vec3 &value) { 
+    buffer[(i + j * width) * 3 + 0] = value.r;
+    buffer[(i + j * width) * 3 + 1] = value.g;
+    buffer[(i + j * width) * 3 + 2] = value.b;
+};
+
 void Image::compileShaders(std::string vertexPath, std::string fragmentPath) {
     std::ostringstream vStream, fStream;
     std::ifstream vFile(vertexPath);

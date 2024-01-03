@@ -16,10 +16,7 @@ constexpr int VERSION_MINOR = 6;
 class UI {
 public:
     UI(int width, int height, std::string title);
-
-    ~UI() {
-        glfwTerminate();
-    }
+    ~UI();
 
     void run();
 

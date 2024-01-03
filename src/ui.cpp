@@ -29,6 +29,10 @@ UI::UI(int width, int height, std::string title) {
     renderer.emplace(width, height);
 }
 
+UI::~UI() {
+    glfwTerminate();
+}
+
 void UI::run() {
     auto future = std::async(std::launch::async, [this](){
         renderer->onRender();

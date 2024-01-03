@@ -18,7 +18,7 @@ class Renderer {
 public:
     Renderer(int width, int height);
     void onRender();
-    void displayImage() { image.display(); };
+    void displayImage();
     Scene generateScene(int index);
 
 private:

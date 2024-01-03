@@ -17,7 +17,7 @@ endif()
 
 file(GLOB_RECURSE source CONFIGURE_DEPENDS 
     "src/*.cpp"
-    "src/glad.c"
+    "src/glad/glad.c"
 )
 
 add_subdirectory("include/glfw")
