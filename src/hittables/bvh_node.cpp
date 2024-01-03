@@ -1,4 +1,4 @@
-#include "bvh_node.h"
+#include "hittables/bvh_node.h"
 
 BVHNode::BVHNode(const Scene &scene) : BVHNode(scene.objects, 0, scene.objects.size()) {}
 

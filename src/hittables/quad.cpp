@@ -1,4 +1,4 @@
-#include "quad.h"
+#include "hittables/quad.h"
 
 Quad::Quad(const Vec3 &Q, const Vec3 &u, const Vec3 &v, std::shared_ptr<Material> mat) : Q(Q), u(u), v(v), mat(mat) { 
     bbox = AABB(Q, Q + u + v).pad();

@@ -1,4 +1,4 @@
-#include "interval.h"
+#include "math/interval.h"
 
 Interval::Interval() : min(+infinity), max(-infinity) {}
 

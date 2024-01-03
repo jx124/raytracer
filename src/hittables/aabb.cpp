@@ -1,4 +1,4 @@
-#include "aabb.h"
+#include "hittables/aabb.h"
 
 AABB::AABB(Interval x, Interval y, Interval z) : x(x), y(y), z(z) {}
 

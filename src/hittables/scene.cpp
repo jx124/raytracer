@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "hittables/scene.h"
 
 Scene::Scene(std::shared_ptr<Hittable> object) {
     add(object);

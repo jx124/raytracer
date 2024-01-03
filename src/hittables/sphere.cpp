@@ -1,4 +1,4 @@
-#include "sphere.h"
+#include "hittables/sphere.h"
 
 Sphere::Sphere(Vec3 center, float radius, std::shared_ptr<Material> material) 
         : center(center), radius(radius), material(material) {

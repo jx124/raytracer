@@ -1,4 +1,4 @@
-#include "ray.h"
+#include "math/ray.h"
 
 Ray::Ray(Vec3 origin, Vec3 direction) : orig(origin), dir(direction) {}
 

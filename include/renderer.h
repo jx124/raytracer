@@ -1,14 +1,14 @@
 #pragma once
 
+#include "hittables/hittable.h"
+#include "hittables/scene.h"
+#include "hittables/sphere.h"
+#include "hittables/quad.h"
+#include "hittables/bvh_node.h"
 #include "image.h"
 #include "utils.h"
-#include "hittable.h"
-#include "scene.h"
-#include "sphere.h"
-#include "quad.h"
 #include "camera.h"
-#include "sampler.h"
-#include "bvh_node.h"
+#include "math/sampler.h"
 
 #include "omp.h"
 

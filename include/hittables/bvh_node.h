@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "hittable.h"
 #include "scene.h"
-#include "rng.h"
+#include "math/rng.h"
 
 #include <algorithm>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "utils.h"
-#include "interval.h"
+#include "math/interval.h"
 
 class AABB {
 public:

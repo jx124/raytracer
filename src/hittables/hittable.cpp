@@ -1,4 +1,4 @@
-#include "hittable.h"
+#include "hittables/hittable.h"
 
 void HitRecord::setFaceNormal(const Ray &ray, const Vec3 &outwardNormal) {
     // Sets normal to be on the same face as hit ray.

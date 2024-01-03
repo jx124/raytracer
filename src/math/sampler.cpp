@@ -1,4 +1,4 @@
-#include "sampler.h"
+#include "math/sampler.h"
 
 Sampler::Sampler(int samplesPerPixel, int seed) : samplesPerPixel(samplesPerPixel), seed(seed), rng(seed) {}
 

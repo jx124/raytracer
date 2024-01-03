@@ -1,4 +1,4 @@
-#include "rng.h"
+#include "math/rng.h"
 
 RNG::RNG(uint64_t seed) {
     state = seed + increment;
