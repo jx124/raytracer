@@ -30,6 +30,10 @@ UI::UI(int width, int height, std::string title) {
 }
 
 UI::~UI() {
+    if (renderer.has_value()) {
+        // Destroy renderer first to prevent segfault from calling OpenGL functions in destructors after glfwTerminate()
+        renderer.reset();
+    }
     glfwTerminate();
 }
 
@@ -38,7 +42,7 @@ void UI::run() {
         renderer->onRender();
     });
 
-    std::future_status status;
+    std::future_status status = std::future_status::timeout;
     auto timeout = std::chrono::milliseconds(0);
 
     while (!glfwWindowShouldClose(window)) {

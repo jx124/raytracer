@@ -4,6 +4,17 @@ Image::Image(int width, int height) : width(width), height(height) {
     buffer = std::vector<float>(width * height * 3, 0.0f);
 }
 
+Image::~Image() {
+    glDeleteTextures(1, &imageTexture);
+    glDeleteProgram(shaderID);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDeleteBuffers(1, &VBO);
+
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &VAO);
+}
+
 void Image::init() {
     std::vector<float> vertices = {
         // vertices       // texture coords

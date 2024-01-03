@@ -13,6 +13,7 @@
 class Image {
 public:
     Image(int width, int height);
+    ~Image();
 
     void init();
     void display();
