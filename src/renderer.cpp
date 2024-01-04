@@ -4,9 +4,13 @@ Renderer::Renderer(int width, int height)
         : width(width), height(height), image(width, height), camera(width, height) {
 
     image.init();
-    sampler = std::make_unique<IndependentSampler>(32);
-    scene = Scene(std::make_shared<BVHNode>(Scene::generateScene(sampler->clone().get(), camera, 3)));
-    integrator = std::make_unique<RandomWalkIntegrator>(scene);
+    sampler = std::make_unique<IndependentSampler>(256);
+    scene = Scene::generateScene(sampler->clone().get(), camera, 3);
+
+    scene.clear();
+    scene.add(std::make_shared<BVHNode>(Scene::generateScene(sampler->clone().get(), camera, 3)));
+
+    integrator = std::make_unique<SimplePathIntegrator>(scene);
 }
 
 void Renderer::onRender() {
@@ -17,7 +21,7 @@ void Renderer::onRender() {
     auto startTime = std::chrono::high_resolution_clock::now();
     int linesComplete = 0;
 
-    #pragma omp parallel default(none) firstprivate(camera) shared(sampler, linesComplete, std::cout)
+    #pragma omp parallel default(none) firstprivate(camera) shared(sampler, linesComplete, std::cout, integrator)
     {
         std::unique_ptr<Sampler> samplerCloneUnique;
 

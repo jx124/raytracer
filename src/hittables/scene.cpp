@@ -140,6 +140,8 @@ Scene Scene::cornellBox(Camera &camera) {
     scene.add(std::make_shared<Quad>(Vec3(0, 555, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
     scene.add(std::make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
 
+    scene.lights.push_back(std::make_shared<Light>(Vec3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
+
     camera.verticalFOV = 40.0f;
     camera.lookFrom = Vec3(278, 278, -800);
     camera.lookAt = Vec3(278, 278, 0);

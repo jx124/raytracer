@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "sphere.h"
 #include "quad.h"
+#include "light.h"
 #include "math/sampler.h"
 
 #include <memory>
@@ -23,6 +24,7 @@ public:
     static Scene generateScene(Sampler* sampler, Camera& camera, int index);
 
     std::vector<std::shared_ptr<Hittable>> objects; // TODO: check if shared_ptr is required.
+    std::vector<std::shared_ptr<Light>> lights;
 
 private:
     static Scene randomSpheres(Sampler* sampler, Camera& camera);
