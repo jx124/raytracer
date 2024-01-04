@@ -21,9 +21,9 @@ BSDFSample Lambertian::sampleBSDF(const Vec3 &wo, const Vec3 &normal, Sampler *s
     float cosTheta = glm::dot(wi, normal);
     float pdf = cosineHemispherePDF(cosTheta);        
 
-    Vec3 BSDFCos = color * cosTheta / pi;
+    Vec3 BSDF = color / pi;
 
-    return {BSDFCos, wi, pdf};
+    return {BSDF, wi, pdf, cosTheta, Flag::Diffuse};
 }
 
 Vec3 Lambertian::Le(const Vec3 &wo, const Vec3 &normal) const {
@@ -36,11 +36,12 @@ Metal::Metal(Vec3 color, float fuzz) : color(color), fuzz(fuzz) {}
 
 BSDFSample Metal::sampleBSDF(const Vec3 &wo, const Vec3 &normal, Sampler *sampler, bool frontFace) const {
     (void) frontFace;
-    Vec3 BSDFCos = color;
+    Vec3 BSDF = color;
     Vec3 wi = reflect(wo, normal) + fuzz * sampleUniformSphere(sampler->get2DPixel());
     float pdf = 1.0f;
+    float cosTheta = 1.0f;
 
-    return {BSDFCos, wi, pdf};
+    return {BSDF, wi, pdf, cosTheta, Flag::Specular};
 }
 
 Vec3 Metal::reflect(const Vec3 &in, const Vec3 &normal)
@@ -62,22 +63,26 @@ BSDFSample Dielectric::sampleBSDF(const Vec3 &wo, const Vec3 &normal, Sampler *s
     float R = fresnelReflectance(in, normal, etaRatio, &cosTheta_i, &cosTheta_t);
     float T = 1.0f - R;
 
-    Vec3 BSDFCos, wi;
+    Vec3 BSDF, wi;
     float pdf;
+    float cosTheta = 1.0f;
+    Flag flag;
 
     if (sampler->get1D() < R) {
         // reflect
-        BSDFCos = Vec3(R);
+        BSDF = Vec3(R);
         wi = Metal::reflect(wo, normal);
         pdf = R;
+        flag = Flag::Specular;
     } else {
         // transmit
-        BSDFCos = Vec3(T / (etaRatio * etaRatio));
+        BSDF = Vec3(T / (etaRatio * etaRatio));
         wi = refract(in, normal, etaRatio, cosTheta_i, cosTheta_t);
         pdf = T;
+        flag = Flag::Transmission;
     }
 
-    return {BSDFCos, wi, pdf};
+    return {BSDF, wi, pdf, cosTheta, flag};
 }
 
 float Dielectric::fresnelReflectance(const Vec3 &in, const Vec3 &normal, 

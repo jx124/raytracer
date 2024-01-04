@@ -10,7 +10,7 @@ public:
     AABB boundingBox() const override;
     bool hit(const Ray& ray, Interval rayT, HitRecord& rec) const override;
 
-private:
+protected:
     Vec3 Q, u, v; // Q is the "origin" and u/v are the two vectors defining the area of the quad.
     Vec3 normal;
     Vec3 w; // n / (n dot n)

@@ -4,10 +4,18 @@
 #include "math/sampler.h"
 #include "glm/glm.hpp"
 
+enum class Flag : uint8_t {
+    Diffuse,
+    Specular,
+    Transmission
+};
+
 struct BSDFSample {
-    Vec3 BSDFCos;
+    Vec3 BSDF; // future materials may require BSDF as a function of input and output rays
     Vec3 wi;
     float pdf = 0;
+    float cosineFactor = 1; // required for Lambertian materials / materials with non Dirac delta-like reflections
+    Flag flag;
 };
 
 // Rendering equation: Lo(p, wo) = Le(p, wo) + Int_Omega BSDF(p, wo, wi) * Li(p, wi) * |cos(theta_i)| dwi
