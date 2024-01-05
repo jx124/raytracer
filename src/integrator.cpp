@@ -30,51 +30,52 @@ Vec3 SimplePathIntegrator::Li(const Ray &ray, Sampler *sampler, int depth) const
     Vec3 L(0.0f);       // sampled radiance
     Vec3 beta(1.0f);    // path throughput weight: product of (BSDF * cos / pdf) terms
     bool specularBounce = true;
-    HitRecord rec;
-    int lightSamples = 0;
+    HitRecord rec, lightRec;
 
-    Ray rayCopy = ray;
+    Ray newRay = ray;
+    BSDFSample bs;
+    LightSample ls;
+
+    int bounces = 0;
 
     while (beta != Vec3(0.0f)) {
-        bool hit = scene.hit(rayCopy, Interval(0.001f, infinity), rec);
-
-        if (!hit) {
+        if (!scene.hit(newRay, Interval(0.001f, infinity), rec)) {
             if (!sampleLights || specularBounce) {
-                L += beta * scene.backgroundColor(rayCopy.dir, backgroundType);
+                L += beta * scene.backgroundColor(newRay.dir, backgroundType);
             }
             break;
         }
 
         if (!sampleLights || specularBounce) {
-            L += beta * rec.mat->Le(rayCopy.dir, rec.normal);
+            L += beta * rec.mat->Le(newRay.dir, rec.normal);
         }
 
-        if (depth-- == 0) {
+        if (bounces++ == depth) {
             break;
         }
 
-        BSDFSample bs = rec.mat->sampleBSDF(rayCopy.dir, rec.normal, sampler, rec.frontFace);
+        bs = rec.mat->sampleBSDF(newRay.dir, rec.normal, sampler, rec.frontFace);
 
-        if (sampleLights && lights.size() != 0) {
+        if (sampleLights && lights.size() != 0 && bs.flag == Flag::Diffuse) {
             int sampledLightIndex = std::floor(sampler->get1D() * lights.size());
-            LightSample ls = lights[sampledLightIndex]->sampleLight(rec.point, sampler);
+            ls = lights[sampledLightIndex]->sampleLight(rec.point, sampler);
             
             if (ls.pdf != 0) {
-                HitRecord lightRec;
-                scene.hit(Ray(rec.point, ls.intersection - rec.point), Interval(0.001f, infinity), lightRec);
+                Vec3 diff = ls.intersection - rec.point;
+                scene.hit(Ray(rec.point, diff), Interval(0.001f, infinity), lightRec);
 
                 bool unoccluded = glm::length(lightRec.point - ls.intersection) < 0.001f;
                 if (unoccluded) {
-                    L += beta * ls.L * bs.BSDF * std::abs(glm::dot(glm::normalize(ls.intersection - rec.point), rec.normal)) / (ls.pdf);
-                    lightSamples++;
+                    L += beta * ls.L * bs.BSDF * std::abs(glm::dot(glm::normalize(diff), rec.normal)) 
+                        * static_cast<float>(lights.size()) / (ls.pdf);
                 }
             }
         }
 
         beta *= bs.BSDF * bs.cosineFactor / bs.pdf;
-        rayCopy = Ray(rec.point, bs.wi);
-        specularBounce = bs.flag == Flag::Specular;
+        newRay = Ray(rec.point, bs.wi);
+        specularBounce = bs.flag != Flag::Diffuse;
     }
 
-    return L * (static_cast<float>(sampler->getSamplesPerPixel()) / (sampler->getSamplesPerPixel() + lightSamples));
+    return L;
 }
