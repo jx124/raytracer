@@ -5,7 +5,7 @@
     <br>
     Test scene with diffuse, metallic, and glass spheres, rendered with depth of field (100 samples per pixel, render time: ~7s).
 </p>
-    
+
 ## Quick Start
 1. Download the latest GLFW source packages from [here](https://www.glfw.org/download.html) and copy them into `include/glfw/`.
 2. Download the latest GLAD loaders from [here](https://glad.dav1d.de/) with the following settings:
@@ -21,18 +21,35 @@
 7. Build and run the program `./build.sh -r`.
 
 ## Features
+This is a toy path tracer meant to explore concepts in computer graphics, parallel programming, as well as various statistical methods e.g. Monte Carlo estimation, multiple importance sampling, low-discrepancy samplers etc. Thus, some features present in production path tracers may not be implemented.
+
+### Integrators
+* `RandomWalkIntegrator`: For every ray intersection, uses importance sampling on the BRDFs of materials to choose the next ray direction, then recursively samples that direction.
+* `SimplePathIntegrator`: Similar to the `RandomWalkIntegrator`, but changes the recursive function calls to an iterative one, and additionally carries out next event estimation by sampling the lights in the scene to further minimize error.
+
+| `RandomWalkIntegrator` | `SimplePathIntegrator` |
+|:----------------------:|:----------------------:|
+| <img src="assets/randomwalk_200spp.png" alt="Scene rendered with the RandomWalkIntegrator at 200 samples per pixel"> | <img src="assets/simplepath_200spp.png" alt="Scene rendered with the SimplePathIntegrator at 200 samples per pixel"> |
+| 200 samples per pixel, render time: ~34s. | 200 samples per pixel, render time: ~24s. |
+
+As seen from these images, the noise present in the scene rendered by the `SimplePathIntegrator` is much smaller despite the shorter rendering time and equal number of samples per pixel.
+However, new artefacts (the bright pixels) are introduced into the image. This could be solved in a later integrator incorporating multiple importance sampling.
+
+### Samplers
+* `IndependentSampler`: returns a uniform sample. 
+
 ### Materials
-* Lambertian: perfectly diffuse material. Modifiable attributes:
+* `Lambertian`: perfectly diffuse material. Modifiable attributes:
     * Color
-* Metal. Modifiable attributes:
+* `Metal`. Modifiable attributes:
     * Color
     * Fuzz
-* Dielectric: glass-like material that both refracts and reflects light. Modifiable attributes:
+* `Dielectric`: glass-like material that both refracts and reflects light. Modifiable attributes:
     * Index of refraction
 
 ### Geometries
 * Spheres
-* Coming soon: triangles/quadrilaterals
+* Quadrilaterals
 
 ### Optimizations
 * Parallelization using OpenMP (~7.4x speedup on 16 core machine).
