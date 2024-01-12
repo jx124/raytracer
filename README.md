@@ -24,16 +24,18 @@
 This is a toy path tracer meant to explore concepts in computer graphics, parallel programming, as well as various statistical methods e.g. Monte Carlo estimation, multiple importance sampling, low-discrepancy samplers etc. Thus, some features present in production path tracers may not be implemented.
 
 ### Integrators
-* `RandomWalkIntegrator`: For every ray intersection, uses importance sampling on the BRDFs of materials to choose the next ray direction, then recursively samples that direction.
+* `RandomWalkIntegrator`: For every ray intersection, uses importance sampling on the BSDFs of materials to choose the next ray direction, then recursively samples that direction.
 * `SimplePathIntegrator`: Similar to the `RandomWalkIntegrator`, but changes the recursive function calls to an iterative one, and additionally carries out next event estimation by sampling the lights in the scene to further minimize error.
+* `PathIntegrator`: Builds on the `SimplePathIntegrator` by using multiple importance sampling to weigh the BSDF and light samples. Implements Russian roulette path termination to cut down on low contribution rays and improve Monte Carlo efficiency.
 
-| `RandomWalkIntegrator` | `SimplePathIntegrator` |
-|:----------------------:|:----------------------:|
-| <img src="assets/randomwalk_200spp.png" alt="Scene rendered with the RandomWalkIntegrator at 200 samples per pixel"> | <img src="assets/simplepath_200spp.png" alt="Scene rendered with the SimplePathIntegrator at 200 samples per pixel"> |
-| 200 samples per pixel, render time: ~34s. | 200 samples per pixel, render time: ~24s. |
+| Integrator | Sample image | Comments |
+|:----------:|:------------:|:--------:|
+| `RandomWalkIntegrator` | <img src="assets/randomwalk_200spp.png" alt="Scene rendered with the RandomWalkIntegrator at 200 samples per pixel"> | 200 samples per pixel, render time: ~34s. |
+| `SimplePathIntegrator` | <img src="assets/simplepath_200spp.png" alt="Scene rendered with the SimplePathIntegrator at 200 samples per pixel"> | 200 samples per pixel, render time: ~24s. |
+| `PathIntegrator`       | <img src="assets/path_200spp.png" alt="Scene rendered with the PathIntegrator at 200 samples per pixel">             | 200 samples per pixel, render time: ~19s. |
 
 As seen from these images, the noise present in the scene rendered by the `SimplePathIntegrator` is much smaller despite the shorter rendering time and equal number of samples per pixel.
-However, new artefacts (the bright pixels) are introduced into the image. This could be solved in a later integrator incorporating multiple importance sampling.
+However, new artefacts (the bright pixels) are introduced into the image. This is resolved in `PathIntegrator` which has an even shorter rendering time.
 
 ### Samplers
 * `IndependentSampler`: returns a uniform sample. 
@@ -41,6 +43,7 @@ However, new artefacts (the bright pixels) are introduced into the image. This c
 ### Materials
 * `Lambertian`: perfectly diffuse material. Modifiable attributes:
     * Color
+    * Emission
 * `Metal`. Modifiable attributes:
     * Color
     * Fuzz
@@ -50,6 +53,9 @@ However, new artefacts (the bright pixels) are introduced into the image. This c
 ### Geometries
 * Spheres
 * Quadrilaterals
+
+### Lights
+* Quadrilateral area lights
 
 ### Optimizations
 * Parallelization using OpenMP (~7.4x speedup on 16 core machine).
