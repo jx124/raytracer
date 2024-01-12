@@ -7,6 +7,7 @@
 #include "light.h"
 
 constexpr int backgroundType = 1;
+constexpr bool sampleLights = true;
 
 class Integrator {
 public:
@@ -14,6 +15,7 @@ public:
     virtual ~Integrator() = default;
 
     virtual Vec3 Li(const Ray& ray, Sampler* sampler, int depth) const = 0;
+    static float powerHeuristic(int n, float nPDF, int m, float mPDF);
 
 protected:
     Scene scene;
@@ -29,6 +31,16 @@ public:
 class SimplePathIntegrator : public Integrator {
 public:
     SimplePathIntegrator(Scene scene);
+
+    virtual Vec3 Li(const Ray& ray, Sampler* sampler, int depth) const override;
+
+private:
+    std::vector<std::shared_ptr<Light>> lights;
+};
+
+class PathIntegrator : public Integrator {
+public:
+    PathIntegrator(Scene scene);
 
     virtual Vec3 Li(const Ray& ray, Sampler* sampler, int depth) const override;
 

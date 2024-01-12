@@ -18,7 +18,7 @@ BSDFSample Lambertian::sampleBSDF(const Vec3 &wo, const Vec3 &normal, Sampler *s
         wi = normal;
     }
 
-    float cosTheta = glm::dot(wi, normal);
+    float cosTheta = glm::dot(glm::normalize(wi), normal);
     float pdf = cosineHemispherePDF(cosTheta);        
 
     Vec3 BSDF = color / pi;

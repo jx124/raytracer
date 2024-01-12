@@ -131,6 +131,7 @@ Scene Scene::cornellBox(Camera &camera) {
     auto white = std::make_shared<Lambertian>(Vec3(0.73f, 0.73f, 0.73f));
     auto green = std::make_shared<Lambertian>(Vec3(0.12f, 0.45f, 0.15f));
     auto light = std::make_shared<Lambertian>(Vec3(1.0f), Vec3(15.0f));
+    auto glass = std::make_shared<Dielectric>(1.5f);
 
     scene.add(std::make_shared<Quad>(Vec3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
     scene.add(std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
@@ -139,6 +140,7 @@ Scene Scene::cornellBox(Camera &camera) {
     scene.add(std::make_shared<Quad>(Vec3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
     scene.add(std::make_shared<Quad>(Vec3(0, 555, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
     scene.add(std::make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+    scene.add(std::make_shared<Sphere>(Vec3(333, 150, 333), 100, glass));
 
     scene.lights.push_back(std::make_shared<Light>(Vec3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
 
